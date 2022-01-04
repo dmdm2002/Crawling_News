@@ -2,16 +2,18 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import pyperclip
+from selenium.webdriver.common.action_chains import ActionChains
 
-sleep_sec = 3
+sleep_sec = 2
 
 
-def naver_login(title, news_url):
+def naver_login(title, news_url, id, pwd):
     driver = webdriver.Chrome('./chromedriver/chromedriver_96.exe')
 
+    action = ActionChains(driver)
     url = 'https://nid.naver.com/nidlogin.login?mode=form&url=https%3A%2F%2Fwww.naver.com'
-    uid = 'rlawjdtn98'
-    upw = 'vnttkrhk15'
+    uid = id
+    upw = pwd
 
     driver.get(url)
     time.sleep(sleep_sec)
@@ -33,34 +35,34 @@ def naver_login(title, news_url):
     login_btn.click()
     time.sleep(sleep_sec)
 
-    driver.get('https://cafe.naver.com/fencers')
-    time.sleep(sleep_sec)
+    for i in range(len(news_url)):
+        if i != 0:
+            driver.close()
+            driver.switch_to.window(driver.window_handles[0])
+        driver.get('https://cafe.naver.com/fencers')
+        time.sleep(sleep_sec)
 
-    news_page = driver.find_element_by_xpath('//*[@id="menuLink69"]')
-    news_page.click()
-    time.sleep(sleep_sec)
+        news_page = driver.find_element_by_xpath('//*[@id="menuLink69"]')
+        news_page.click()
+        time.sleep(sleep_sec)
 
-    write_page = driver.find_element_by_xpath('//*[@id="cafe-info-data"]/div[3]/a')
-    write_page.click()
-    time.sleep(sleep_sec)
+        driver.switch_to.frame('cafe_main')
+        write_page = driver.find_element_by_xpath('//*[@id="writeFormBtn"]')
+        write_page.click()
 
-    driver.switch_to.frame(driver.find_element_by_id("cafe_main"))
+        time.sleep(sleep_sec)
+        driver.switch_to.window(driver.window_handles[1])
 
-    name = driver.find_element_by_id("subject")
-    name.click()
-    pyperclip.copy(title)
-    name.send_keys(Keys.CONTROL, 'v')
-    time.sleep(sleep_sec)
+        driver.find_element_by_xpath('//*[@id="app"]/div/div/section/div/div[2]/div[1]/div[1]/div[2]/div/textarea').click()
+        action.send_keys(f'{title[i]}').perform()
+        time.sleep(sleep_sec)
 
-    writing = driver.find_element_by_id("textbox")
-    writing.click()
-    pyperclip.copy(news_url)
-    writing.send_keys(Keys.CONTROL, 'v')
-    time.sleep(sleep_sec)
+        driver.find_element_by_xpath('//span[contains(text(),"내용을")]').click()
+        action.send_keys(news_url[i], Keys.ENTER).perform()
+        time.sleep(5)
 
-    complete = driver.find_element_by_xpath('//*[@id="app"]/div/div/section/div/div[1]/div/a')
-    complete.click()
-    time.sleep(sleep_sec)
+        complete = driver.find_element_by_xpath('//*[@id="app"]/div/div/section/div/div[1]/div/a')
+        complete.click()
+        time.sleep(sleep_sec)
 
-
-naver_login('a', 'b')
+    driver.close()
