@@ -39,14 +39,14 @@ class Crawling_news(options):
                 if now_page == pages-1:
                     for i in range(self.get_item_count - stack_count):
                         temp = datas[i].text.strip()
-                        indx = temp.find('펜싱')
+                        indx = temp.find(self.keyword)
                         if indx != -1:
                             url_list.append(datas[i].get('href'))
                             name_list.append(datas[i].text.strip())
                 else:
                     for i in range(len(datas)):
                         temp = datas[i].text.strip()
-                        indx = temp.find('펜싱')
+                        indx = temp.find(self.keyword)
                         if indx != -1:
                             url_list.append(datas[i].get('href'))
                             name_list.append(datas[i].text.strip())
